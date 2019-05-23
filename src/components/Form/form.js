@@ -13,14 +13,17 @@ export default class Form extends Component {
         this.messageRef = firebase.database().ref().child('messages');
         this.listenMessages();
     }
+
     componentWillReceiveProps(nextProps) {
         if(nextProps.user) {
             this.setState({'userName': nextProps.user.displayName});
         }
     }
+
     handleChange(event) {
         this.setState({message: event.target.value});
     }
+
     handleSend() {
         if (this.state.message) {
             var newItem = {
@@ -32,10 +35,12 @@ export default class Form extends Component {
             this.setState({ message: '' });
         }
     }
+
     handleKeyPress(event) {
         if (event.key !== 'Enter') return;
         this.handleSend();
     }
+
     listenMessages() {
         this.messageRef
             .limitToLast(10)
@@ -47,31 +52,36 @@ export default class Form extends Component {
 
             });
     }
+
     render() {
         return (
-            <div className="form">
-                <div className="form__message">
-                    { this.state.list.map((item, index) =>
-                        <Message key={index} message={item} />
-                    )}
+                <div className="form">
+                    {firebase.auth().currentUser!==null &&
+                        <div>
+                            <div className="form__message">
+                                { this.state.list.map((item, index) =>
+                                    <Message key={index} message={item} />
+                                )}
+                            </div>
+                            <div className="form__row">
+                                <input
+                                    className="form__input"
+                                    type="text"
+                                    placeholder="Type message"
+                                    value={this.state.message}
+                                    onChange={this.handleChange.bind(this)}
+                                    onKeyPress={this.handleKeyPress.bind(this)}
+                                />
+                                <button
+                                    className="form__button"
+                                    onClick={this.handleSend.bind(this)}
+                                >
+                                    send
+                                </button>
+                            </div>
+                        </div>
+                    }
                 </div>
-                <div className="form__row">
-                    <input
-                        className="form__input"
-                        type="text"
-                        placeholder="Type message"
-                        value={this.state.message}
-                        onChange={this.handleChange.bind(this)}
-                        onKeyPress={this.handleKeyPress.bind(this)}
-                    />
-                    <button
-                        className="form__button"
-                        onClick={this.handleSend.bind(this)}
-                    >
-                        send
-                    </button>
-                </div>
-            </div>
         );
     }
 }
